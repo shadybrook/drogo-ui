@@ -101,7 +101,20 @@ export const OrderProvider = ({ children }) => {
 
   const placeOrder = async (orderData) => {
     if (!user?.id) {
+      console.error('🔍 OrderContext: No user ID found:', user);
       toast.error('Please sign in to place an order');
+      return { success: false };
+    }
+
+    // Validate required order data
+    if (!orderData.total || !orderData.address || !orderData.deliverySpot || !orderData.items?.length) {
+      console.error('🔍 OrderContext: Missing required order data:', {
+        total: !!orderData.total,
+        address: !!orderData.address,
+        deliverySpot: !!orderData.deliverySpot,
+        itemsCount: orderData.items?.length || 0
+      });
+      toast.error('Missing required order information. Please check your cart and delivery details.');
       return { success: false };
     }
 
@@ -110,38 +123,49 @@ export const OrderProvider = ({ children }) => {
 
     setLoading(true);
     try {
-      const { data, error } = await createOrder({
+      const orderPayload = {
         user_id: user.id,
         total_amount: orderData.total,
         delivery_address: orderData.address,
         delivery_spot: orderData.deliverySpot,
         terrace_accessible: orderData.terraceAccessible,
         items: orderData.items
-      });
+      };
+
+      console.log('🔍 OrderContext: Sending payload to createOrder:', orderPayload);
+
+      const { data, error } = await createOrder(orderPayload);
 
       console.log('🔍 OrderContext: createOrder result:', { data, error });
 
       if (error) {
-        console.error('Error placing order:', error);
-        toast.error('Failed to place order. Please try again.');
+        console.error('🔍 OrderContext: Error placing order:', error);
+        toast.error(`Failed to place order: ${error.message || 'Please try again.'}`);
         return { success: false, error };
+      }
+
+      if (!data) {
+        console.error('🔍 OrderContext: No data returned from createOrder');
+        toast.error('Order placement failed - no data received. Please try again.');
+        return { success: false };
       }
 
       // Update local state
       setOrders(prev => [data, ...prev]);
       setCurrentOrder(data);
       
+      console.log('🔍 OrderContext: Order placed successfully:', data);
       toast.success('Order placed successfully! 🚁');
       
       // Start order status simulation for demo
       if (data?.id) {
-        simulateOrderProgress(data.id);
+        setTimeout(() => simulateOrderProgress(data.id), 1000);
       }
 
-      return { success: true, orderId: data.id };
+      return { success: true, orderId: data.id, data };
     } catch (error) {
-      console.error('Error placing order:', error);
-      toast.error('Failed to place order. Please try again.');
+      console.error('🔍 OrderContext: Exception placing order:', error);
+      toast.error(`Order failed: ${error.message || 'Please try again.'}`);
       return { success: false, error };
     } finally {
       setLoading(false);

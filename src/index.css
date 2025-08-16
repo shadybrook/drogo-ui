@@ -967,14 +967,31 @@ body {
   background: transparent !important;
   border: none !important;
   z-index: 1000 !important;
+  pointer-events: auto !important;
 }
 
 .custom-delivery-marker div {
   cursor: pointer !important;
   transition: transform 0.2s ease !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
 }
 
-.custom-delivery-marker:hover div {
+/* Enhanced mobile touch support */
+@media (max-width: 768px) {
+  .custom-delivery-marker div {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    cursor: pointer !important;
+  }
+}
+
+.custom-delivery-marker:hover div,
+.custom-delivery-marker:active div {
   transform: scale(1.1) !important;
 }
 

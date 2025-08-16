@@ -10,21 +10,51 @@ export const createOrder = async (orderData) => {
   
   if (useMockData) {
     console.log('🔍 Database: Using mock data implementation');
+    
+    // Validate required fields for mock data
+    if (!orderData.user_id || !orderData.total_amount || !orderData.delivery_address || !orderData.items?.length) {
+      console.error('🔍 Database: Mock validation failed:', {
+        user_id: !!orderData.user_id,
+        total_amount: !!orderData.total_amount,
+        delivery_address: !!orderData.delivery_address,
+        items: orderData.items?.length || 0
+      });
+      return { 
+        data: null, 
+        error: { message: 'Missing required order data' }
+      };
+    }
+    
     // Mock implementation for development
     const mockOrder = {
       id: uuidv4(),
       ...orderData,
       status: 'confirmed',
       created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
       estimated_delivery: new Date(Date.now() + 10 * 60 * 1000).toISOString() // 10 minutes
     };
     
-    // Store in localStorage for demo
-    const orders = JSON.parse(localStorage.getItem('drogo_orders') || '[]');
-    orders.push(mockOrder);
-    localStorage.setItem('drogo_orders', JSON.stringify(orders));
+    console.log('🔍 Database: Generated mock order:', mockOrder);
     
-    console.log('🔍 Database: Mock order created:', mockOrder);
+    // Store in localStorage for demo
+    try {
+      const orders = JSON.parse(localStorage.getItem('drogo_orders') || '[]');
+      orders.push(mockOrder);
+      localStorage.setItem('drogo_orders', JSON.stringify(orders));
+      console.log('🔍 Database: Mock order saved to localStorage');
+    } catch (error) {
+      console.error('🔍 Database: Error saving to localStorage:', error);
+      return { 
+        data: null, 
+        error: { message: 'Failed to save order to local storage' }
+      };
+    }
+    
+    // Simulate slight delay for realism
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    console.log('🔍 Database: Mock order created successfully:', mockOrder);
     return { data: mockOrder, error: null };
   }
 

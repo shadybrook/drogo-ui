@@ -54,25 +54,33 @@ const InteractiveMap = ({ isPanelExpanded, setIsPanelExpanded, showOnLanding = f
       iconAnchor: [anchor, anchor],
       popupAnchor: [0, -anchor],
       html: `
-        <div style="
-          width: ${size}px; 
-          height: ${size}px; 
-          background: ${isSelected ? '#00D67F' : '#ff4757'}; 
-          border: 3px solid white;
-          border-radius: 50%;
-          box-shadow: ${isSelected ? '0 4px 16px rgba(0, 214, 127, 0.4)' : '0 2px 8px rgba(0, 0, 0, 0.3)'};
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: ${fontSize}px;
-          cursor: pointer;
-          z-index: 1000;
-          transition: all 0.3s ease;
-          transform: ${isSelected ? 'scale(1.1)' : 'scale(1)'};
-        ">
-          ${getSpotIcon(spot.type)}
-        </div>
-      `
+        <div 
+          data-spot-id="${spot.id}"
+          style="
+            width: ${size}px; 
+            height: ${size}px; 
+            background: ${isSelected ? '#00D67F' : '#ff4757'}; 
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: ${isSelected ? '0 4px 16px rgba(0, 214, 127, 0.4)' : '0 2px 8px rgba(0, 0, 0, 0.3)'};
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: ${fontSize}px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            transform: ${isSelected ? 'scale(1.1)' : 'scale(1)'};
+            pointer-events: auto;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+          ">
+            ${getSpotIcon(spot.type)}
+          </div>
+        `
     });
   };
 
@@ -207,7 +215,9 @@ const InteractiveMap = ({ isPanelExpanded, setIsPanelExpanded, showOnLanding = f
               icon={createDeliveryIcon(spot)}
               zIndexOffset={selectedDeliverySpot?.id === spot.id ? 2000 : 1500}
               eventHandlers={{
-                click: () => handleSpotSelect(spot.id)
+                click: () => handleSpotSelect(spot.id),
+                touchstart: () => handleSpotSelect(spot.id),
+                touchend: () => handleSpotSelect(spot.id)
               }}
             />
           ))}
