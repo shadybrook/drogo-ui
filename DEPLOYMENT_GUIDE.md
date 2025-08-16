@@ -42,8 +42,8 @@
 ### 2.1 Create Local .env File
 ```bash
 # Create .env in project root
-REACT_APP_SUPABASE_URL=https://your-project-id.supabase.co
-REACT_APP_SUPABASE_ANON_KEY=your-anon-key-here
+REACT_APP_SUPABASE_URL=https://exdnazmunvvbqzihoavp.supabase.co
+REACT_APP_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV4ZG5hem11bnZ2YnF6aWhvYXZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUzMjIxNzMsImV4cCI6MjA3MDg5ODE3M30.7zf4Pi-KEfm0yATbaYAz0tzTohqdi-QlH9qOHkU81PU
 ```
 
 ### 2.2 Test Local Setup

@@ -134,15 +134,15 @@ export const subscribeToPushNotifications = async (userId) => {
   }, 2000);
 };
 
-// Browser notification click handler
-export const handleNotificationClick = (event) => {
-  event.notification.close();
-  
-  const data = event.notification.data;
-  if (data?.orderId) {
-    // Focus the app window and navigate to orders
-    if (clients.openWindow) {
-      clients.openWindow('/orders');
-    }
-  }
-};
+// Browser notification click handler (only used in service worker context)
+// export const handleNotificationClick = (event) => {
+//   event.notification.close();
+//   
+//   const data = event.notification.data;
+//   if (data?.orderId) {
+//     // Focus the app window and navigate to orders
+//     if (typeof clients !== 'undefined' && clients.openWindow) {
+//       clients.openWindow('/orders');
+//     }
+//   }
+// };
