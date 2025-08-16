@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { 
   createOrder, 
@@ -29,6 +29,33 @@ export const OrderProvider = ({ children }) => {
   const [currentOrder, setCurrentOrder] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const fetchUserOrders = useCallback(async () => {
+    if (!user?.id) return;
+    
+    setLoading(true);
+    try {
+      const { data, error } = await getUserOrders(user.id);
+      if (error) {
+        console.error('Error fetching orders:', error);
+        toast.error('Failed to load orders');
+      } else {
+        setOrders(data || []);
+        // Set current order to the most recent pending order
+        const pendingOrder = data?.find(order => 
+          ['confirmed', 'preparing', 'dispatched'].includes(order.status)
+        );
+        if (pendingOrder) {
+          setCurrentOrder(pendingOrder);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+      toast.error('Failed to load orders');
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.id]);
+
   // Initialize push notifications and fetch orders on login
   useEffect(() => {
     if (user?.id) {
@@ -44,7 +71,7 @@ export const OrderProvider = ({ children }) => {
       setOrders([]);
       setCurrentOrder(null);
     }
-  }, [user]);
+  }, [user, fetchUserOrders]);
 
   // Subscribe to real-time order updates
   useEffect(() => {
@@ -70,34 +97,7 @@ export const OrderProvider = ({ children }) => {
     });
 
     return unsubscribe;
-  }, [user, currentOrder]);
-
-  const fetchUserOrders = async () => {
-    if (!user?.id) return;
-    
-    setLoading(true);
-    try {
-      const { data, error } = await getUserOrders(user.id);
-      if (error) {
-        console.error('Error fetching orders:', error);
-        toast.error('Failed to load orders');
-      } else {
-        setOrders(data || []);
-        // Set current order to the most recent pending order
-        const pendingOrder = data?.find(order => 
-          ['confirmed', 'preparing', 'dispatched'].includes(order.status)
-        );
-        if (pendingOrder) {
-          setCurrentOrder(pendingOrder);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-      toast.error('Failed to load orders');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [user, currentOrder, fetchUserOrders]);
 
   const placeOrder = async (orderData) => {
     if (!user?.id) {

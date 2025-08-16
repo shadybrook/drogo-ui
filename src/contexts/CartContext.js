@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useOrders } from './OrderContext';
+// import { useOrders } from './OrderContext'; // Unused import removed
 // import { toast } from 'react-toastify'; // Removed - not used after removing notifications
 
 const CartContext = createContext();

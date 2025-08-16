@@ -7,7 +7,6 @@ const AdminDashboard = () => {
   const [orders, setOrders] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -42,7 +41,7 @@ const AdminDashboard = () => {
 
   const handleStatusUpdate = async (orderId, newStatus) => {
     try {
-      const { data, error } = await updateOrderStatus(orderId, newStatus);
+      const { error } = await updateOrderStatus(orderId, newStatus);
       
       if (error) {
         toast.error('Failed to update order status');

@@ -4,7 +4,7 @@ import { formatCurrency } from '../data/products';
 import BottomNavigation from './BottomNavigation';
 
 const OrdersPage = () => {
-  const { currentOrder, getOrderStatus, getEstimatedDeliveryTime } = useOrders();
+  const { currentOrder, getEstimatedDeliveryTime } = useOrders();
   const [etaMinutes, setEtaMinutes] = useState(8);
 
   // Scroll to top when component mounts
@@ -24,7 +24,7 @@ const OrdersPage = () => {
   }, [currentOrder, getEstimatedDeliveryTime]);
 
   // Get current order status and timeline
-  const orderStatusInfo = getOrderStatus(currentOrder);
+  // const orderStatusInfo = getOrderStatus(currentOrder); // Unused variable removed
   
   const getStatusSteps = () => {
     if (!currentOrder) {
