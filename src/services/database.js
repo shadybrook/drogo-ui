@@ -4,7 +4,12 @@ import { v4 as uuidv4 } from 'uuid';
 // ===== ORDER MANAGEMENT =====
 
 export const createOrder = async (orderData) => {
+  console.log('🔍 Database: createOrder called with:', orderData);
+  console.log('🔍 Database: useMockData =', useMockData);
+  console.log('🔍 Database: supabase client =', !!supabase);
+  
   if (useMockData) {
+    console.log('🔍 Database: Using mock data implementation');
     // Mock implementation for development
     const mockOrder = {
       id: uuidv4(),
@@ -19,6 +24,7 @@ export const createOrder = async (orderData) => {
     orders.push(mockOrder);
     localStorage.setItem('drogo_orders', JSON.stringify(orders));
     
+    console.log('🔍 Database: Mock order created:', mockOrder);
     return { data: mockOrder, error: null };
   }
 

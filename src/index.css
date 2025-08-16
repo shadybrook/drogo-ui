@@ -916,8 +916,7 @@ body {
   border-radius: 50% !important;
   box-shadow: 0 2px 8px rgba(0, 214, 127, 0.3) !important;
   animation: markerPulse 2s ease-in-out infinite;
-  position: absolute !important;
-  transform: translate(-50%, -100%) !important;
+  /* Removed conflicting transform - let Leaflet handle positioning */
 }
 
 .delivery-marker {
@@ -935,8 +934,7 @@ body {
   cursor: pointer !important;
   transform-origin: center bottom !important;
   will-change: transform !important;
-  position: absolute !important;
-  transform: translate(-50%, -100%) !important;
+  /* Removed conflicting transform - let Leaflet handle positioning */
 }
 
 .delivery-marker.selected {

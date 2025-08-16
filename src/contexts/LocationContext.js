@@ -126,11 +126,11 @@ export const LocationProvider = ({ children }) => {
     const savedAddress = localStorage.getItem('drogo_selected_address');
     const savedDeliverySpot = localStorage.getItem('drogo_selected_delivery_spot');
     
-    if (savedAddress && !selectedAddress) {
+    if (savedAddress) {
       setSelectedAddress(savedAddress);
     }
     
-    if (savedDeliverySpot && !selectedDeliverySpot) {
+    if (savedDeliverySpot) {
       try {
         const spot = JSON.parse(savedDeliverySpot);
         setSelectedDeliverySpot(spot);
@@ -139,7 +139,7 @@ export const LocationProvider = ({ children }) => {
         localStorage.removeItem('drogo_selected_delivery_spot');
       }
     }
-  }, [selectedAddress, selectedDeliverySpot]);
+  }, []); // Only run once on mount
 
   // Save location data to localStorage whenever it changes
   useEffect(() => {

@@ -105,6 +105,9 @@ export const OrderProvider = ({ children }) => {
       return { success: false };
     }
 
+    console.log('🔍 OrderContext: Starting order placement with data:', orderData);
+    console.log('🔍 OrderContext: User ID:', user.id);
+
     setLoading(true);
     try {
       const { data, error } = await createOrder({
@@ -115,6 +118,8 @@ export const OrderProvider = ({ children }) => {
         terrace_accessible: orderData.terraceAccessible,
         items: orderData.items
       });
+
+      console.log('🔍 OrderContext: createOrder result:', { data, error });
 
       if (error) {
         console.error('Error placing order:', error);
