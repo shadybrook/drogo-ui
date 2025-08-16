@@ -32,8 +32,28 @@ const CartDrawer = () => {
       return;
     }
 
+    // Debug logging to help identify the issue
+    console.log('Checkout validation:', {
+      selectedAddress,
+      selectedDeliverySpot,
+      totalItems,
+      cartTotal: cartTotal.total
+    });
+
     if (!selectedAddress || !selectedDeliverySpot) {
-      toast.error('Please select delivery address and spot first!');
+      console.error('Checkout failed - missing:', {
+        address: !!selectedAddress,
+        deliverySpot: !!selectedDeliverySpot
+      });
+      
+      if (!selectedAddress) {
+        toast.error('Please select a delivery address first! Go to the landing page to set your address.');
+      } else if (!selectedDeliverySpot) {
+        toast.error('Please select a delivery spot from the map! Go to the landing page to choose a spot.');
+      } else {
+        toast.error('Please select delivery address and spot first!');
+      }
+      
       closeCart();
       navigate('/');
       return;

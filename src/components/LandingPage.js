@@ -130,7 +130,8 @@ const LandingPage = () => {
     }
     
     // All requirements met - now update context and proceed
-    updateAddress(selectedAddressLocal);
+    // Preserve the delivery spot selection when updating address
+    updateAddress(selectedAddressLocal, true);
     // Removed notification - navigation to home page is sufficient feedback
     // toast.success('Welcome to DroGo! 🚁');
     navigate('/home');

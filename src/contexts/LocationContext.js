@@ -121,7 +121,25 @@ export const LocationProvider = ({ children }) => {
         localStorage.removeItem('drogo_location');
       }
     }
-  }, []);
+    
+    // Also load from individual localStorage keys for better persistence
+    const savedAddress = localStorage.getItem('drogo_selected_address');
+    const savedDeliverySpot = localStorage.getItem('drogo_selected_delivery_spot');
+    
+    if (savedAddress && !selectedAddress) {
+      setSelectedAddress(savedAddress);
+    }
+    
+    if (savedDeliverySpot && !selectedDeliverySpot) {
+      try {
+        const spot = JSON.parse(savedDeliverySpot);
+        setSelectedDeliverySpot(spot);
+      } catch (error) {
+        console.error('Error parsing saved delivery spot:', error);
+        localStorage.removeItem('drogo_selected_delivery_spot');
+      }
+    }
+  }, [selectedAddress, selectedDeliverySpot]);
 
   // Save location data to localStorage whenever it changes
   useEffect(() => {
@@ -189,8 +207,13 @@ export const LocationProvider = ({ children }) => {
     }
   };
 
-  const updateAddress = (address) => {
+  const updateAddress = (address, preserveDeliverySpot = false) => {
     setSelectedAddress(address);
+    
+    // Save to localStorage for persistence
+    if (address) {
+      localStorage.setItem('drogo_selected_address', address);
+    }
     
     // Check if address is in serviceable area
     const isServiceable = checkServiceableArea(address);
@@ -198,8 +221,10 @@ export const LocationProvider = ({ children }) => {
     if (isServiceable && address && address.length > 5) {
       // Always show map for serviceable areas
       setIsMapVisible(true);
-      // Reset delivery spot when address changes - user must select a spot
-      setSelectedDeliverySpot(null);
+      // Only reset delivery spot if not preserving it (e.g., when user manually changes address)
+      if (!preserveDeliverySpot) {
+        setSelectedDeliverySpot(null);
+      }
       // Provide feedback that they need to select a delivery spot (reduced frequency)
       // toast.info('Please select a delivery spot from the map to continue 📍');
     } else if (address && address.length > 5 && !isServiceable) {
@@ -209,7 +234,9 @@ export const LocationProvider = ({ children }) => {
       setSelectedDeliverySpot(null);
     } else {
       setIsMapVisible(true); // Always show map for address selection
-      setSelectedDeliverySpot(null);
+      if (!preserveDeliverySpot) {
+        setSelectedDeliverySpot(null);
+      }
     }
   };
 
@@ -275,6 +302,10 @@ export const LocationProvider = ({ children }) => {
     }
     
     setSelectedDeliverySpot(spot);
+    
+    // Save to localStorage for persistence
+    localStorage.setItem('drogo_selected_delivery_spot', JSON.stringify(spot));
+    
     return true;
   };
 
@@ -377,6 +408,17 @@ export const LocationProvider = ({ children }) => {
     localStorage.removeItem('drogo_location');
   };
 
+  // Debug function to check current location state
+  const getLocationState = () => {
+    return {
+      selectedAddress,
+      selectedDeliverySpot,
+      isMapVisible,
+      terraceAccessible,
+      userLocation
+    };
+  };
+
   const value = {
     // State
     selectedAddress,
@@ -408,7 +450,10 @@ export const LocationProvider = ({ children }) => {
     
     // Map controls
     setIsMapVisible,
-    setShowIntentForm
+    setShowIntentForm,
+    
+    // Debug
+    getLocationState
   };
 
   return (
