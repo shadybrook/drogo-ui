@@ -12,88 +12,12 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const { user, setShowAuthModal } = useAuth();
   const {
-    selectedAddress,
     terraceAccessible,
     selectedDeliverySpot,
-    isSearching,
-    searchResults,
-    updateAddress,
-    updateTerraceAccessibility,
-    searchAddresses
+    updateTerraceAccessibility
   } = useLocation();
 
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
-
-  const handleAddressChange = async (e) => {
-    const value = e.target.value;
-    // Only update the local display, don't trigger updateAddress yet
-    setSelectedAddressLocal(value);
-    
-    if (value.length > 2) {
-      try {
-        await searchAddresses(value);
-        setShowSuggestions(searchResults && searchResults.length > 0);
-      } catch (error) {
-        console.error('Search error:', error);
-        setShowSuggestions(false);
-      }
-    } else {
-      setShowSuggestions(false);
-    }
-  };
-
-  // Local state for address input to prevent auto-navigation
-  const [selectedAddressLocal, setSelectedAddressLocal] = useState(selectedAddress || '');
-
-  // Update suggestions when search results change
-  useEffect(() => {
-    setShowSuggestions(searchResults && searchResults.length > 0);
-  }, [searchResults]);
-
-  // Sync local state with context when selectedAddress changes externally
-  useEffect(() => {
-    if (selectedAddress && selectedAddress !== selectedAddressLocal) {
-      setSelectedAddressLocal(selectedAddress);
-    }
-  }, [selectedAddress, selectedAddressLocal]);
-
-  const handleAddressBlur = () => {
-    // Delay hiding suggestions to allow clicks
-    setTimeout(() => setShowSuggestions(false), 200);
-  };
-
-  const selectAddress = (result) => {
-    if (!result) return;
-    const address = typeof result === 'string' ? result : (result.formatted_address || '');
-    if (address) {
-      setSelectedAddressLocal(address);
-      // Don't call updateAddress here to prevent automatic navigation
-      // Just update the local state for display
-    }
-    setShowSuggestions(false);
-  };
-
-  const handleUseCurrentLocation = async () => {
-    if (!navigator.geolocation) {
-      alert('Geolocation is not supported by this browser.');
-      return;
-    }
-
-    setIsLoadingLocation(true);
-    try {
-      // Mock current location detection without automatic navigation
-      const mockAddress = 'Andheri Metro Station, Andheri West, Mumbai, Maharashtra';
-      setSelectedAddressLocal(mockAddress);
-      // Removed notification - visual feedback of address appearing is sufficient
-      // toast.success('Location detected successfully! Please select a delivery spot on the map. 📍');
-    } catch (error) {
-      console.error('Location error:', error);
-      toast.error('Unable to get location. Please enter manually.');
-    } finally {
-      setIsLoadingLocation(false);
-    }
-  };
+  // No longer need search box functionality
 
   const handleContinue = () => {
     // Step 1: Check authentication
@@ -103,37 +27,14 @@ const LandingPage = () => {
       return;
     }
     
-    // Step 2: Check address input
-    if (!selectedAddressLocal || selectedAddressLocal.trim().length < 5) {
-      toast.error('Please enter a valid delivery address');
-      return;
-    }
-    
-    // Step 3: Check delivery spot selection
+    // Step 2: Check delivery spot selection (only requirement now)
     if (!selectedDeliverySpot) {
       toast.error('Please select a delivery spot from the map below');
       setIsPanelExpanded(true);
       return;
     }
     
-    // Step 4: Validate that the address is serviceable
-    const isServiceable = selectedAddressLocal.toLowerCase().includes('andheri') || 
-                         selectedAddressLocal.toLowerCase().includes('lokhandwala') ||
-                         selectedAddressLocal.toLowerCase().includes('oshiwara') ||
-                         selectedAddressLocal.toLowerCase().includes('versova') ||
-                         selectedAddressLocal.toLowerCase().includes('infiniti') ||
-                         selectedAddressLocal.toLowerCase().includes('midc');
-    
-    if (!isServiceable) {
-      toast.error('Please select an address in our service area (Andheri West)');
-      return;
-    }
-    
-    // All requirements met - now update context and proceed
-    // Preserve the delivery spot selection when updating address
-    updateAddress(selectedAddressLocal, true);
-    // Removed notification - navigation to home page is sufficient feedback
-    // toast.success('Welcome to DroGo! 🚁');
+    // All requirements met - proceed to home
     navigate('/home');
   };
 
@@ -192,76 +93,12 @@ const LandingPage = () => {
         </div>
       </div>
 
-      {/* Address Input Section */}
+      {/* Delivery Location Section */}
       <div className="address-section">
         <div className="address-container">
-          <h3 className="address-title">Where should we deliver?</h3>
+          <h3 className="address-title">Select Your Delivery Location</h3>
           
-          <div className="location-input-group">
-            <div className="input-with-icon">
-              <div className="input-icon">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-              </div>
-              <input 
-                type="text" 
-                value={selectedAddressLocal}
-                onChange={handleAddressChange}
-                onBlur={handleAddressBlur}
-                className="address-input" 
-                placeholder="Enter your delivery address"
-                autoComplete="street-address"
-              />
-              <button 
-                className="location-btn" 
-                onClick={handleUseCurrentLocation}
-                disabled={isLoadingLocation}
-              >
-                {isLoadingLocation ? (
-                  <div className="spinner" style={{ width: '18px', height: '18px' }}></div>
-                ) : (
-                  <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
-                )}
-              </button>
-            </div>
-            
-            <div className={`address-suggestions ${showSuggestions ? 'show' : ''}`}>
-              {isSearching && (
-                <div className="suggestion-item" style={{ justifyContent: 'center', opacity: 0.7 }}>
-                  <div className="spinner" style={{ width: '16px', height: '16px', marginRight: '8px' }}></div>
-                  <span>Searching addresses...</span>
-                </div>
-              )}
-              {!isSearching && searchResults && searchResults.map((result, index) => (
-                <div 
-                  key={result.place_id || index}
-                  className="suggestion-item" 
-                  onClick={() => selectAddress(result)}
-                >
-                  <div className="suggestion-icon">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 600, color: 'var(--ink)' }}>
-                      {result.formatted_address ? result.formatted_address.split(',')[0] : 'Unknown'}
-                    </div>
-                    <div style={{ fontSize: '0.875rem', color: 'var(--muted)' }}>
-                      {result.formatted_address || 'No address available'}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Interactive Map Section - Always show for address selection */}
+          {/* Interactive Map Section - Select from available spots */}
           <InteractiveMap 
             isPanelExpanded={isPanelExpanded}
             setIsPanelExpanded={setIsPanelExpanded}
@@ -305,15 +142,13 @@ const LandingPage = () => {
           <button 
             className="continue-btn" 
             onClick={handleContinue}
-            disabled={!user || !selectedAddressLocal || selectedAddressLocal.trim().length < 5 || !selectedDeliverySpot}
+            disabled={!user || !selectedDeliverySpot}
           >
             <span>
               {!user 
                 ? 'Sign In to Continue'
-                : !selectedAddressLocal || selectedAddressLocal.trim().length < 5
-                ? 'Enter Your Address'
                 : !selectedDeliverySpot
-                ? 'Select a Spot on the Map'
+                ? 'Select a Delivery Spot on the Map'
                 : `Continue with ${selectedDeliverySpot.name}`
               }
             </span>

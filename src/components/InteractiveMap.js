@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import { useLocation } from '../contexts/LocationContext';
-// import { toast } from 'react-toastify'; // Removed - not used after removing notifications
+import { toast } from 'react-toastify';
 
 // Fix for default markers
 delete L.Icon.Default.prototype._getIconUrl;
@@ -98,16 +98,14 @@ const InteractiveMap = ({ isPanelExpanded, setIsPanelExpanded, showOnLanding = f
   const handleSpotSelect = (spotId) => {
     const success = selectDeliverySpot(spotId);
     if (success) {
-      // Removed notification - visual feedback on map is sufficient
-      // const selectedSpot = deliverySpots.find(s => s.id === spotId);
-      // if (selectedSpot) {
-      //   toast.success(`✅ ${selectedSpot.name} selected`, {
-      //     autoClose: 1500,
-      //   });
-      // }
-      
-      // Don't auto-center on spot selection - let user see all markers
-      // User can scroll to continue button if needed
+      // Provide user feedback when clicking on delivery spots
+      const selectedSpot = deliverySpots.find(s => s.id === spotId);
+      if (selectedSpot) {
+        toast.success(`📍 ${selectedSpot.name} selected for delivery`, {
+          autoClose: 2000,
+          position: "bottom-center"
+        });
+      }
     }
   };
 
